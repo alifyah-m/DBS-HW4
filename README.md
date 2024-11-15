@@ -11,6 +11,13 @@ Data Visualization: Interactive tables and reports for easy data interpretation.
 Responsive Design: User-friendly interface accessible on various devices.
 Tech Stack
 
+Steps for Setup
+Change the local database connection in the 'server.js' file. Current setup is user: 'postgres', host: 'localhost', database: '...', password: '...', port: 5432, Change any values if needed to match your local database.
+All tables being used in local database are located in the 'create_tables.sql' file and ‘populate_tables.sql’ file. You should be able to copy and paste the entire files into postgres query tool and execute to generate the required database. If you can't do the entire .sql file at once, then generate each table one at a time.
+Install the external 'node.js' at https://nodejs.org/en, click on the download tab and then prebuilt installer, select the correct download for your local system.
+Once node.js is installed, you will need to run several npm commands in your terminal. npm install express https://expressjs.com/ npm install cors https://www.npmjs.com/package/cors npm install path https://www.npmjs.com/package/path npm install pg https://www.npmjs.com/package/pg
+To run the server, type in the terminal node server.js
+
 Frontend:
 HTML5
 CSS3
