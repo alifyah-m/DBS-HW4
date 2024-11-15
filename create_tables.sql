@@ -1,3 +1,5 @@
+-- create_tables.sql
+
 -- Restaurant Table
 DROP TABLE IF EXISTS restaurant CASCADE;
 CREATE TABLE restaurant (
