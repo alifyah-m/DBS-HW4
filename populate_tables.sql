@@ -1,3 +1,5 @@
+-- populate_tables.sql
+
 -- Populating the BankAccount Table
 INSERT INTO bank_account (account_number, account_holder_name, balance) VALUES
 ('BA1234567890', 'NehAlifs BBQ Corporate Account', 100000.00),  -- bank_account_id = 1
@@ -146,7 +148,7 @@ FROM (
 ) AS sub
 WHERE bank_account.bank_account_id = sub.bank_account_id;
 
--- Adding to company's account
+-- Adding to company's account (assuming bank_account_id = 1)
 UPDATE bank_account SET balance = balance + (
     SELECT SUM(amount) FROM payment
 ) WHERE bank_account_id = 1;
