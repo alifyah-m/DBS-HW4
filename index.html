@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NehAlifs BBQ Management Dashboard</title>
+    <style>
+        /* Your existing styles */
+    </style>
+</head>
+<body>
+    <h1>NehAlifs BBQ Management Dashboard</h1>
+    <div class="container">
+        <!-- Fetch Data and Insights Buttons -->
+        <button onclick="fetchAllData()">Fetch All Data</button>
+        <button onclick="fetchDailyRevenue()">Daily Revenue Report</button>
+        <button onclick="fetchTopMenuItems()">Top Menu Items</button>
+        <button onclick="fetchTopCustomers()">Top Customers by Spending</button>
+
+        <!-- Customer Form -->
+        <h2>Add New Customer</h2>
+        <form id="add-customer-form">
+            First Name: <input type="text" name="first_name" required><br>
+            Last Name: <input type="text" name="last_name" required><br>
+            Email: <input type="email" name="email" required><br>
+            Phone Number: <input type="text" name="phone" required><br>
+            Loyalty Card Number: <input type="text" name="loyalty_card_number"><br>
+            <button type="submit">Add Customer</button>
+        </form>
+
+        <!-- Process Payment Form -->
+        <h2>Process Payment</h2>
+        <form id="process-payment-form">
+            Order ID: <input type="number" name="order_id" required><br>
+            Amount: <input type="number" name="amount" step="0.01" required><br>
+            Payment Method: 
+            <select name="payment_method">
+                <option value="Cash">Cash</option>
+                <option value="Card">Card</option>
+            </select><br>
+            Card Details ID (if Card): <input type="number" name="card_details_id"><br>
+            Bank Account ID: <input type="number" name="bank_account_id" required><br>
+            <button type="submit">Process Payment</button>
+        </form>
+
+        <!-- Data Sections -->
+        <!-- Similar sections for displaying data -->
+        <!-- Daily Revenue Report Table -->
+        <div id="dailyRevenue" class="section">
+            <h2>Daily Revenue Report</h2>
+            <table>
+                <tr><th>Order Date</th><th>Daily Revenue</th></tr>
+                <tbody id="dailyRevenueTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Top Menu Items Table -->
+        <div id="topMenuItems" class="section">
+            <h2>Top Menu Items</h2>
+            <table>
+                <tr><th>Menu Item</th><th>Total Quantity Sold</th></tr>
+                <tbody id="topMenuItemsTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Top Customers Table -->
+        <div id="topCustomers" class="section">
+            <h2>Top Customers by Spending</h2>
+            <table>
+                <tr><th>Customer Name</th><th>Total Spent</th></tr>
+                <tbody id="topCustomersTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Add other data tables as needed -->
+
+    </div>
+
+    <script>
+        // JavaScript functions
+
+        // Event listener for adding customer
+        document.getElementById('add-customer-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            try {
+                const response = await fetch('/customers', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    alert(`Customer added with ID: ${result.customer_id}`);
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error adding customer:', error);
+                alert('Error adding customer.');
+            }
+        });
+
+        // Event listener for processing payment
+        document.getElementById('process-payment-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            try {
+                const response = await fetch('/process-payment', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error processing payment:', error);
+                alert('Error processing payment.');
+            }
+        });
+
+        // Fetch functions
+        async function fetchAllData() {
+            try {
+                const response = await fetch('/all-data');
+                const data = await response.json();
+                populateTables(data);
+            } catch (error) {
+                console.error('Error loading all data:', error);
+                alert('Error loading all data');
+            }
+        }
+
+        async function fetchDailyRevenue() {
+            await fetchData('/daily-revenue', 'dailyRevenueTable', ['order_date', 'daily_revenue']);
+        }
+
+        async function fetchTopMenuItems() {
+            await fetchData('/top-menu-items', 'topMenuItemsTable', ['name', 'total_quantity_sold']);
+        }
+
+        async function fetchTopCustomers() {
+            await fetchData('/top-customers', 'topCustomersTable', ['customer_name', 'total_spent']);
+        }
+
+        async function fetchData(url, tableId, columns) {
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                populateTable(tableId, data, columns);
+            } catch (error) {
+                console.error(`Error fetching data from ${url}:`, error);
+                alert(`Error fetching data from ${url}`);
+            }
+        }
+
+        function populateTable(tableId, rows, columns) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = rows.map(row => 
+                `<tr>${columns.map(col => `<td>${row[col] || 'N/A'}</td>`).join('')}</tr>`).join('');
+        }
+
+        function populateTables(data) {
+            if (data.orders) {
+                populateTable('ordersTable', data.orders, ['order_id', 'customer_id', 'total_amount', 'order_date']);
+            }
+            if (data.customers) {
+                populateTable('customersTable', data.customers, ['customer_id', 'first_name', 'last_name', 'email', 'phone']);
+            }
+            if (data.menuItems) {
+                populateTable('menuItemsTable', data.menuItems, ['menu_item_id', 'name', 'price', 'category']);
+            }
+            // Populate other tables similarly
+        }
+    </script>
+</body>
+</html>
