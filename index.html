@@ -3,52 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <title>NehAlifs BBQ Management Dashboard</title>
-    <style>
-        /* Your existing styles */
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>NehAlifs BBQ Management Dashboard</h1>
     <div class="container">
-        <!-- Fetch Data and Insights Buttons -->
+
+        <!-- Buttons to Fetch Data and Reports -->
         <button onclick="fetchAllData()">Fetch All Data</button>
         <button onclick="fetchDailyRevenue()">Daily Revenue Report</button>
         <button onclick="fetchTopMenuItems()">Top Menu Items</button>
         <button onclick="fetchTopCustomers()">Top Customers by Spending</button>
 
-        <!-- Customer Form -->
+        <!-- Add New Customer Form -->
         <h2>Add New Customer</h2>
         <form id="add-customer-form">
-            First Name: <input type="text" name="first_name" required><br>
-            Last Name: <input type="text" name="last_name" required><br>
-            Email: <input type="email" name="email" required><br>
-            Phone Number: <input type="text" name="phone" required><br>
-            Loyalty Card Number: <input type="text" name="loyalty_card_number"><br>
+            <label>
+                First Name:
+                <input type="text" name="first_name" required>
+            </label>
+            <label>
+                Last Name:
+                <input type="text" name="last_name" required>
+            </label>
+            <label>
+                Email:
+                <input type="email" name="email" required>
+            </label>
+            <label>
+                Phone Number:
+                <input type="text" name="phone" required>
+            </label>
+            <label>
+                Loyalty Card Number:
+                <input type="text" name="loyalty_card_number">
+            </label>
             <button type="submit">Add Customer</button>
         </form>
 
         <!-- Process Payment Form -->
         <h2>Process Payment</h2>
         <form id="process-payment-form">
-            Order ID: <input type="number" name="order_id" required><br>
-            Amount: <input type="number" name="amount" step="0.01" required><br>
-            Payment Method: 
-            <select name="payment_method">
-                <option value="Cash">Cash</option>
-                <option value="Card">Card</option>
-            </select><br>
-            Card Details ID (if Card): <input type="number" name="card_details_id"><br>
-            Bank Account ID: <input type="number" name="bank_account_id" required><br>
+            <label>
+                Order ID:
+                <input type="number" name="order_id" required>
+            </label>
+            <label>
+                Amount:
+                <input type="number" name="amount" step="0.01" required>
+            </label>
+            <label>
+                Payment Method:
+                <select name="payment_method" required>
+                    <option value="Cash">Cash</option>
+                    <option value="Card">Card</option>
+                </select>
+            </label>
+            <label>
+                Card Details ID (if Card):
+                <input type="number" name="card_details_id">
+            </label>
+            <label>
+                Bank Account ID:
+                <input type="number" name="bank_account_id" required>
+            </label>
             <button type="submit">Process Payment</button>
         </form>
 
+        <!-- Menu Items Section -->
+        <h2>Menu</h2>
+        <div id="menu-items"></div>
+
+        <!-- Order Summary Section -->
+        <h2>Order Summary</h2>
+        <div id="order-summary"></div>
+
+        <!-- Place Order Form -->
+        <h2>Place Order</h2>
+        <form id="place-order-form">
+            <label>
+                Customer ID:
+                <input type="number" name="customer_id" required>
+            </label>
+            <label>
+                Restaurant ID:
+                <input type="number" name="restaurant_id" required>
+            </label>
+            <button type="submit">Submit Order</button>
+        </form>
+
         <!-- Data Sections -->
-        <!-- Similar sections for displaying data -->
+        <!-- Customers Table -->
+        <div id="customers" class="section">
+            <h2>Customers</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                    </tr>
+                </thead>
+                <tbody id="customersTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Orders Table -->
+        <div id="orders" class="section">
+            <h2>Orders</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer ID</th>
+                        <th>Total Amount</th>
+                        <th>Order Date</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Menu Items Table -->
+        <div id="menuItems" class="section">
+            <h2>Menu Items</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Menu Item ID</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody id="menuItemsTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Employees Table -->
+        <div id="employees" class="section">
+            <h2>Employees</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody id="employeesTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Receipts Table -->
+        <div id="receipts" class="section">
+            <h2>Receipts</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Receipt ID</th>
+                        <th>Order ID</th>
+                        <th>Receipt Date</th>
+                    </tr>
+                </thead>
+                <tbody id="receiptsTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Payments Table -->
+        <div id="payments" class="section">
+            <h2>Payments</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Payment Date</th>
+                        <th>Amount</th>
+                        <th>Payment Method</th>
+                        <th>Bank Account ID</th>
+                        <th>Card Details ID</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentsTable"></tbody>
+            </table>
+        </div>
+
+        <!-- Bank Accounts Table -->
+        <div id="bankAccounts" class="section">
+            <h2>Bank Accounts</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bank Account ID</th>
+                        <th>Account Number</th>
+                        <th>Account Holder Name</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="bankAccountsTable"></tbody>
+            </table>
+        </div>
+
         <!-- Daily Revenue Report Table -->
         <div id="dailyRevenue" class="section">
             <h2>Daily Revenue Report</h2>
             <table>
-                <tr><th>Order Date</th><th>Daily Revenue</th></tr>
+                <thead>
+                    <tr>
+                        <th>Order Date</th>
+                        <th>Daily Revenue</th>
+                    </tr>
+                </thead>
                 <tbody id="dailyRevenueTable"></tbody>
             </table>
         </div>
@@ -57,7 +225,12 @@
         <div id="topMenuItems" class="section">
             <h2>Top Menu Items</h2>
             <table>
-                <tr><th>Menu Item</th><th>Total Quantity Sold</th></tr>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Total Quantity Sold</th>
+                    </tr>
+                </thead>
                 <tbody id="topMenuItemsTable"></tbody>
             </table>
         </div>
@@ -66,120 +239,19 @@
         <div id="topCustomers" class="section">
             <h2>Top Customers by Spending</h2>
             <table>
-                <tr><th>Customer Name</th><th>Total Spent</th></tr>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Total Spent</th>
+                    </tr>
+                </thead>
                 <tbody id="topCustomersTable"></tbody>
             </table>
         </div>
 
-        <!-- Add other data tables as needed -->
-
     </div>
 
-    <script>
-        // JavaScript functions
-
-        // Event listener for adding customer
-        document.getElementById('add-customer-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            try {
-                const response = await fetch('/customers', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                if (response.ok) {
-                    alert(`Customer added with ID: ${result.customer_id}`);
-                } else {
-                    alert(`Error: ${result.error}`);
-                }
-            } catch (error) {
-                console.error('Error adding customer:', error);
-                alert('Error adding customer.');
-            }
-        });
-
-        // Event listener for processing payment
-        document.getElementById('process-payment-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            try {
-                const response = await fetch('/process-payment', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                if (response.ok) {
-                    alert(result.message);
-                } else {
-                    alert(`Error: ${result.error}`);
-                }
-            } catch (error) {
-                console.error('Error processing payment:', error);
-                alert('Error processing payment.');
-            }
-        });
-
-        // Fetch functions
-        async function fetchAllData() {
-            try {
-                const response = await fetch('/all-data');
-                const data = await response.json();
-                populateTables(data);
-            } catch (error) {
-                console.error('Error loading all data:', error);
-                alert('Error loading all data');
-            }
-        }
-
-        async function fetchDailyRevenue() {
-            await fetchData('/daily-revenue', 'dailyRevenueTable', ['order_date', 'daily_revenue']);
-        }
-
-        async function fetchTopMenuItems() {
-            await fetchData('/top-menu-items', 'topMenuItemsTable', ['name', 'total_quantity_sold']);
-        }
-
-        async function fetchTopCustomers() {
-            await fetchData('/top-customers', 'topCustomersTable', ['customer_name', 'total_spent']);
-        }
-
-        async function fetchData(url, tableId, columns) {
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                populateTable(tableId, data, columns);
-            } catch (error) {
-                console.error(`Error fetching data from ${url}:`, error);
-                alert(`Error fetching data from ${url}`);
-            }
-        }
-
-        function populateTable(tableId, rows, columns) {
-            const tableBody = document.getElementById(tableId);
-            tableBody.innerHTML = rows.map(row => 
-                `<tr>${columns.map(col => `<td>${row[col] || 'N/A'}</td>`).join('')}</tr>`).join('');
-        }
-
-        function populateTables(data) {
-            if (data.orders) {
-                populateTable('ordersTable', data.orders, ['order_id', 'customer_id', 'total_amount', 'order_date']);
-            }
-            if (data.customers) {
-                populateTable('customersTable', data.customers, ['customer_id', 'first_name', 'last_name', 'email', 'phone']);
-            }
-            if (data.menuItems) {
-                populateTable('menuItemsTable', data.menuItems, ['menu_item_id', 'name', 'price', 'category']);
-            }
-            // Populate other tables similarly
-            
-        }
-    </script>
+    <!-- Include the script.js file -->
     <script src="script.js"></script>
-
 </body>
 </html>
