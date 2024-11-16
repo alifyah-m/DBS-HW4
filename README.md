@@ -124,23 +124,6 @@ nehAlifs-bbq-dashboard/
 └── README.md               # Project documentation
 Scripts and Queries
 
-SQL Scripts:
-create_tables.sql: Defines the database schema, tables, constraints, and indexes.
-populate_tables.sql: Inserts initial data into the tables for testing.
-Server Routes (server.js):
-GET /daily-revenue: Retrieves daily revenue data.
-GET /top-menu-items: Retrieves top-selling menu items.
-GET /top-customers: Retrieves top customers by spending.
-POST /customers: Adds a new customer.
-POST /process-payment: Processes a payment transaction.
-GET /all-data: Retrieves all data for display.
-Static Files: Serves static files from the public directory.
-Frontend Functions (index.html or scripts.js):
-Event listeners for form submissions.
-Functions to fetch and display data from the server.
-Dynamic table population for reports and data sections.
-Troubleshooting
-
 Server Not Starting:
 Ensure PostgreSQL is running.
 Check that you have installed all dependencies with npm install.
