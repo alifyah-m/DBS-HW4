@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const { Pool } = require('pg');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 app.use(bodyParser.json());
@@ -12,39 +13,138 @@ app.use(cors());
 
 // Database connection configuration
 const pool = new Pool({
-    user: 'postgres',
+    user: 'postgres',          // Replace with your PostgreSQL username
     host: 'localhost',
-    database: 'restaurant',
-    password: '2201',
+    database: 'NehAlif_dash',  // Ensure this database exists
+    password: '2201',          // Replace with your PostgreSQL password
     port: 5432,
 });
-
-// Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Helper function to fetch data from a query
-async function fetchData(query, params = []) {
-    try {
-        const result = await pool.query(query, params);
-        return result.rows;
-    } catch (err) {
-        console.error('Error executing query:', err.message);
-        return null;
-    }
-}
 
 // ======================
 // API Endpoints
 // ======================
 
-// Fetch menu items
-app.get('/menu', async (req, res) => {
+// Create Tables Endpoint
+app.post('/create-tables', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM menu_item');
+        const createTablesSql = fs.readFileSync('create_tables.sql').toString();
+        await pool.query(createTablesSql);
+        res.status(200).json({ message: 'Tables created successfully.' });
+    } catch (err) {
+        console.error('Error creating tables:', err.message);
+        res.status(500).json({ error: 'Failed to create tables' });
+    }
+});
+
+// Initialize Database Endpoint
+app.post('/initialize-db', async (req, res) => {
+    try {
+        const populateTablesSql = fs.readFileSync('populate_tables.sql').toString();
+        await pool.query(populateTablesSql);
+        res.status(200).json({ message: 'Database initialized successfully.' });
+    } catch (err) {
+        console.error('Error initializing database:', err.message);
+        res.status(500).json({ error: 'Failed to initialize database' });
+    }
+});
+
+// Delete All Rows Endpoint
+app.delete('/delete-rows/:tableName', async (req, res) => {
+    const { tableName } = req.params;
+    try {
+        await pool.query(`DELETE FROM ${tableName}`);
+        res.status(200).json({ message: `All rows deleted from ${tableName}.` });
+    } catch (err) {
+        console.error(`Error deleting rows from ${tableName}:`, err.message);
+        res.status(500).json({ error: `Failed to delete rows from ${tableName}` });
+    }
+});
+
+// Browse Data Endpoint
+app.get('/browse/:tableName', async (req, res) => {
+    const { tableName } = req.params;
+    try {
+        const result = await pool.query(`SELECT * FROM ${tableName} LIMIT 10`);
         res.status(200).json(result.rows);
     } catch (err) {
-        console.error('Error fetching menu items:', err.message);
-        res.status(500).json({ error: 'Failed to fetch menu items' });
+        console.error(`Error browsing data from ${tableName}:`, err.message);
+        res.status(500).json({ error: `Failed to browse data from ${tableName}` });
+    }
+});
+
+app.get('/menu', async (req, res) => {
+    try {
+      const result = await pool.query(
+        'SELECT menu_item_id, name, description, price::float, category FROM menu_item'
+      );
+      res.status(200).json(result.rows);
+    } catch (err) {
+      console.error('Error fetching menu items:', err);
+      res.status(500).json({ error: 'Failed to fetch menu items' });
+    }
+  });
+  
+
+// Add New Menu Item
+app.post('/menu-items', async (req, res) => {
+    const { name, description, price, category } = req.body;
+    try {
+        const result = await pool.query(
+            'INSERT INTO menu_item (name, description, price, category) VALUES ($1, $2, $3, $4) RETURNING *',
+            [name, description, price, category]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error('Error adding menu item:', err.message);
+        res.status(500).json({ error: 'Server error while adding menu item' });
+    }
+});
+
+// Get All Orders
+app.get('/orders', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM orders');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error('Error fetching orders:', err.message);
+        res.status(500).json({ error: 'Failed to fetch orders' });
+    }
+});
+
+// Get All Payments
+app.get('/payments', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT *, amount::float FROM payment');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error('Error fetching payments:', err.message);
+        res.status(500).json({ error: 'Failed to fetch payments' });
+    }
+});
+
+// Get All Bank Accounts
+app.get('/bank-accounts', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT *, balance::float FROM bank_account');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error('Error fetching bank accounts:', err.message);
+        res.status(500).json({ error: 'Failed to fetch bank accounts' });
+    }
+});
+
+// Add New Bank Account
+app.post('/bank-accounts', async (req, res) => {
+    const { account_number, account_holder_name, balance } = req.body;
+    try {
+        const result = await pool.query(
+            'INSERT INTO bank_account (account_number, account_holder_name, balance) VALUES ($1, $2, $3) RETURNING *',
+            [account_number, account_holder_name, balance]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error('Error adding bank account:', err.message);
+        res.status(500).json({ error: 'Server error while adding bank account' });
     }
 });
 
@@ -75,7 +175,7 @@ app.post('/place-order', async (req, res) => {
 
         // Update total_amount in orders table
         const totalResult = await client.query(
-            `SELECT SUM(quantity * price) AS total_amount FROM order_item WHERE order_id = $1`,
+            `SELECT COALESCE(SUM(quantity * price), 0) AS total_amount FROM order_item WHERE order_id = $1`,
             [order_id]
         );
         const total_amount = totalResult.rows[0].total_amount;
@@ -106,9 +206,9 @@ app.post('/process-payment', async (req, res) => {
         await client.query('BEGIN');
 
         // Insert into payment table
-        const paymentResult = await client.query(
+        await client.query(
             `INSERT INTO payment (order_id, amount, payment_method, card_details_id, bank_account_id) 
-            VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+            VALUES ($1, $2, $3, $4, $5)`,
             [order_id, amount, payment_method, card_details_id || null, bank_account_id]
         );
 
@@ -144,117 +244,44 @@ app.post('/process-payment', async (req, res) => {
 // Add New Customer
 app.post('/customers', async (req, res) => {
     const { first_name, last_name, email, phone, loyalty_card_number } = req.body;
+
+    if (!first_name || !last_name || !email || !phone) {
+        return res.status(400).json({ error: 'All fields except loyalty_card_number are required' });
+    }
+
     try {
         const result = await pool.query(
             'INSERT INTO customer (first_name, last_name, email, phone, loyalty_card_number) VALUES ($1, $2, $3, $4, $5) RETURNING *',
             [first_name, last_name, email, phone, loyalty_card_number || null]
         );
-        res.json(result.rows[0]);
+        console.log('Customer added:', result.rows[0]);
+        res.status(201).json(result.rows[0]);
     } catch (err) {
         console.error('Error adding customer:', err.message);
-        res.status(500).json({ error: 'Server error while adding customer' });
+        if (err.message.includes('duplicate key value')) {
+            res.status(409).json({ error: 'Duplicate email or loyalty card number' });
+        } else {
+            res.status(500).json({ error: 'Server error while adding customer' });
+        }
     }
 });
 
-// Get All Data
-app.get('/all-data', async (req, res) => {
+// Get all customers
+app.get('/customers', async (req, res) => {
     try {
-        const orders = await fetchData('SELECT * FROM orders');
-        const customers = await fetchData('SELECT * FROM customer');
-        const menuItems = await fetchData('SELECT * FROM menu_item');
-        const bankAccounts = await fetchData('SELECT * FROM bank_account');
-        const payments = await fetchData('SELECT * FROM payment');
-        const employees = await fetchData('SELECT * FROM employee');
-        const receipts = await fetchData('SELECT * FROM receipt');
-
-        const allData = {
-            orders,
-            customers,
-            menuItems,
-            bankAccounts,
-            payments,
-            employees,
-            receipts,
-        };
-
-        res.status(200).json(allData);
+        const result = await pool.query('SELECT * FROM customer');
+        res.status(200).json(result.rows);
     } catch (err) {
-        console.error('Error fetching all data:', err.message);
-        res.status(500).json({ error: 'Failed to fetch all data' });
+        console.error('Error fetching customers:', err.message);
+        res.status(500).json({ error: 'Failed to fetch customers' });
     }
 });
 
-// Daily Revenue Report
-app.get('/daily-revenue', async (req, res) => {
-    const query = `
-        SELECT 
-            DATE(order_date) AS order_date, 
-            SUM(total_amount)::float AS daily_revenue
-        FROM 
-            orders
-        GROUP BY 
-            DATE(order_date)
-        ORDER BY 
-            DATE(order_date) DESC;
-    `;
-    const result = await fetchData(query);
-    if (result) {
-        res.status(200).json(result);
-    } else {
-        res.status(500).json({ error: 'Error fetching daily revenue report.' });
-    }
-});
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Top Menu Items
-app.get('/top-menu-items', async (req, res) => {
-    const query = `
-        SELECT 
-            mi.name, 
-            SUM(oi.quantity) AS total_quantity_sold
-        FROM 
-            order_item oi
-        JOIN 
-            menu_item mi ON oi.menu_item_id = mi.menu_item_id
-        GROUP BY 
-            mi.name
-        ORDER BY 
-            total_quantity_sold DESC
-        LIMIT 5;
-    `;
-    const result = await fetchData(query);
-    if (result) {
-        res.status(200).json(result);
-    } else {
-        res.status(500).json({ error: 'Error fetching top menu items.' });
-    }
-});
-
-// Top Customers by Spending
-app.get('/top-customers', async (req, res) => {
-    const query = `
-        SELECT 
-            c.first_name || ' ' || c.last_name AS customer_name,
-            SUM(o.total_amount)::float AS total_spent
-        FROM 
-            orders o
-        JOIN 
-            customer c ON o.customer_id = c.customer_id
-        GROUP BY 
-            c.customer_id, customer_name
-        ORDER BY 
-            total_spent DESC
-        LIMIT 5;
-    `;
-    const result = await fetchData(query);
-    if (result) {
-        res.status(200).json(result);
-    } else {
-        res.status(500).json({ error: 'Error fetching top customers.' });
-    }
-});
-
-// Serve index.html
-app.get('/', (req, res) => {
+// Serve index.html for any unmatched routes
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
