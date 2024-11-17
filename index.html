@@ -9,11 +9,11 @@
     <h1>NehAlifs BBQ Management Dashboard</h1>
     <div class="container">
 
-        <!-- Buttons to Fetch Data and Reports -->
-        <button onclick="fetchAllData()">Fetch All Data</button>
-        <button onclick="fetchDailyRevenue()">Daily Revenue Report</button>
-        <button onclick="fetchTopMenuItems()">Top Menu Items</button>
-        <button onclick="fetchTopCustomers()">Top Customers by Spending</button>
+        <!-- GUI Buttons -->
+        <button id="create-tables-btn">Create Tables</button>
+        <button id="initialize-db-btn">Initialize Database</button>
+        <button id="delete-rows-btn">Delete All Rows from a Table</button>
+        <button id="browse-data-btn">Browse Data</button>
 
         <!-- Add New Customer Form -->
         <h2>Add New Customer</h2>
@@ -39,6 +39,24 @@
                 <input type="text" name="loyalty_card_number">
             </label>
             <button type="submit">Add Customer</button>
+        </form>
+
+        <!-- Add New Bank Account Form -->
+        <h2>Add New Bank Account</h2>
+        <form id="add-bank-account-form">
+            <label>
+                Account Number:
+                <input type="text" name="account_number" required>
+            </label>
+            <label>
+                Account Holder Name:
+                <input type="text" name="account_holder_name" required>
+            </label>
+            <label>
+                Balance:
+                <input type="number" name="balance" step="0.01" required>
+            </label>
+            <button type="submit">Add Bank Account</button>
         </form>
 
         <!-- Process Payment Form -->
@@ -68,6 +86,28 @@
                 <input type="number" name="bank_account_id" required>
             </label>
             <button type="submit">Process Payment</button>
+        </form>
+
+        <!-- Add New Menu Item Form -->
+        <h2>Add New Menu Item</h2>
+        <form id="add-menu-item-form">
+            <label>
+                Name:
+                <input type="text" name="name" required>
+            </label>
+            <label>
+                Description:
+                <textarea name="description"></textarea>
+            </label>
+            <label>
+                Price:
+                <input type="number" name="price" step="0.01" required>
+            </label>
+            <label>
+                Category:
+                <input type="text" name="category" required>
+            </label>
+            <button type="submit">Add Menu Item</button>
         </form>
 
         <!-- Menu Items Section -->
@@ -142,37 +182,6 @@
             </table>
         </div>
 
-        <!-- Employees Table -->
-        <div id="employees" class="section">
-            <h2>Employees</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Employee ID</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Role</th>
-                    </tr>
-                </thead>
-                <tbody id="employeesTable"></tbody>
-            </table>
-        </div>
-
-        <!-- Receipts Table -->
-        <div id="receipts" class="section">
-            <h2>Receipts</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Receipt ID</th>
-                        <th>Order ID</th>
-                        <th>Receipt Date</th>
-                    </tr>
-                </thead>
-                <tbody id="receiptsTable"></tbody>
-            </table>
-        </div>
-
         <!-- Payments Table -->
         <div id="payments" class="section">
             <h2>Payments</h2>
@@ -204,48 +213,6 @@
                     </tr>
                 </thead>
                 <tbody id="bankAccountsTable"></tbody>
-            </table>
-        </div>
-
-        <!-- Daily Revenue Report Table -->
-        <div id="dailyRevenue" class="section">
-            <h2>Daily Revenue Report</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Order Date</th>
-                        <th>Daily Revenue</th>
-                    </tr>
-                </thead>
-                <tbody id="dailyRevenueTable"></tbody>
-            </table>
-        </div>
-
-        <!-- Top Menu Items Table -->
-        <div id="topMenuItems" class="section">
-            <h2>Top Menu Items</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Total Quantity Sold</th>
-                    </tr>
-                </thead>
-                <tbody id="topMenuItemsTable"></tbody>
-            </table>
-        </div>
-
-        <!-- Top Customers Table -->
-        <div id="topCustomers" class="section">
-            <h2>Top Customers by Spending</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Customer Name</th>
-                        <th>Total Spent</th>
-                    </tr>
-                </thead>
-                <tbody id="topCustomersTable"></tbody>
             </table>
         </div>
 
